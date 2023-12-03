@@ -3,7 +3,8 @@ package kr.easw.lesson06.controller;
 import kr.easw.lesson06.model.dto.RemoveUserDto;
 import kr.easw.lesson06.model.dto.UserDataEntity;
 import kr.easw.lesson06.service.UserDataService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,26 +13,22 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserDataEndpoint {
     private final UserDataService userDataService;
 
     @GetMapping("/list")
-    public List<String> listUsers() {
-        // Fetch all users and convert them to a list of user IDs.
-        return userDataService.getAllUsers().stream()
+    public ResponseEntity<List<String>> listUsers() {
+        List<String> userIds = userDataService.getAllUsers().stream()
                 .map(UserDataEntity::getUserId)
                 .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(userIds);
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<String> removeUser(@RequestBody RemoveUserDto removeUserDto) {
-        boolean isRemoved = userDataService.removeUser(removeUserDto.getUserId());
-        if (isRemoved) {
-            return ResponseEntity.ok("User removed successfully");
-        } else {
-            return ResponseEntity.badRequest().body("Failed to remove user");
-        }
+    public ResponseEntity<?> removeUser(@RequestBody RemoveUserDto removeUserDto) {
+        return userDataService.removeUser(removeUserDto.getUserId())
+                ? ResponseEntity.ok("User removed successfully")
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to remove user");
     }
-
 }
