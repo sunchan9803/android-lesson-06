@@ -1,23 +1,32 @@
+<!DOCTYPE html>
 <html>
-<body>
-<h1> 사용자 대시보드 <a href="/admin">(관리자 대시보드로 이동)</a></h1>
-<span> REST 요청을 보내 파일 목록을 불러오고, 다음 li에 다운로드 링크와 함께 삽입하십시오. </span>
-<span>REST로 데이터 목록을 불러오는 예제는 <a href="https://github.com/java-lesson-cbnu/android-lesson-01">1번 예제 레포지토리</a>를 참고하세요. </span>
-<ul id="dataList">
-
-</ul>
-</body>
-<script>
-    (async () => {
-        const response = await fetch('/api/v1/data/list');
-        const result = await response.json();
-        console.log(result);
-        for (let i = 0; i < result.length; i++) {
-            let li = document.createElement("li");
-            li.appendChild(document.createTextNode(result[i].text));
-            document.getElementById("dataList").appendChild(li);
+<head>
+    <title>사용자 대시보드</title>
+    <script>
+        async function loadData() {
+            const dataList = document.getElementById('dataList');
+            try {
+                const response = await fetch('/api/v1/data/list');
+                const data = await response.json();
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item.text;
+                    dataList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('데이터 로드 실패:', error);
+            }
         }
-    })()
-</script>
 
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</head>
+<body>
+    <h1>사용자 대시보드 <a href="/admin">(관리자 대시보드로 이동)</a></h1>
+    <span>REST 요청을 통해 파일 목록을 불러오고 아래에 다운로드 링크와 함께 삽입하십시오.</span><br>
+    <span>REST를 통한 데이터 목록 불러오기 예제는 <a href="https://github.com/java-lesson-cbnu/android-lesson-01">1번 예제 레포지토리</a>를 참고하세요.</span>
+    <ul id="dataList">
+        <!-- 여기에 데이터가 로드됩니다 -->
+    </ul>
+</body>
 </html>
